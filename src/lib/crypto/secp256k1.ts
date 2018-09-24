@@ -247,6 +247,19 @@ export interface Secp256k1 {
   ) => boolean;
 }
 
+const enum ByteLength {
+  maxSig = 72,
+  maxPublicKey = 65,
+  messageHash = 32,
+  internalPublicKey = 64,
+  compressedPublicKey = 33,
+  uncompressedPublicKey = 65,
+  internalSig = 64,
+  compactSig = 64,
+  privateKey = 32,
+  randomSeed = 32
+}
+
 /**
  * @param secp256k1Wasm a Secp256k1Wasm object
  * @param randomSeed a 32-byte random seed used to randomize the context after
@@ -263,16 +276,6 @@ const wrapSecp256k1Wasm = (
    */
   const contextPtr = secp256k1Wasm.contextCreate(ContextFlag.BOTH);
 
-  const maxSigLength = 72;
-  const maxPublicKeyLength = 65;
-  const messageHashLength = 32;
-  const internalPublicKeyLength = 64;
-  const compressedPublicKeyLength = 33;
-  const uncompressedPublicKeyLength = 65;
-  const internalSigLength = 64;
-  const compactSigLength = 64;
-  const privateKeyLength = 32;
-  const randomSeedLength = 32;
   /**
    * Since all of these methods are single-threaded and synchronous, we can
    * reuse allocated WebAssembly memory for each method without worrying about
@@ -284,12 +287,14 @@ const wrapSecp256k1Wasm = (
    * considered a critical vulnerability in the consumer. However, as a best
    * practice, we zero out private keys below when we're finished with them.
    */
-  const sigScratch = secp256k1Wasm.malloc(maxSigLength);
-  const publicKeyScratch = secp256k1Wasm.malloc(maxPublicKeyLength);
-  const messageHashScratch = secp256k1Wasm.malloc(messageHashLength);
-  const internalPublicKeyPtr = secp256k1Wasm.malloc(internalPublicKeyLength);
-  const internalSigPtr = secp256k1Wasm.malloc(internalSigLength);
-  const privateKeyPtr = secp256k1Wasm.malloc(privateKeyLength);
+  const sigScratch = secp256k1Wasm.malloc(ByteLength.maxSig);
+  const publicKeyScratch = secp256k1Wasm.malloc(ByteLength.maxPublicKey);
+  const messageHashScratch = secp256k1Wasm.malloc(ByteLength.messageHash);
+  const internalPublicKeyPtr = secp256k1Wasm.malloc(
+    ByteLength.internalPublicKey
+  );
+  const internalSigPtr = secp256k1Wasm.malloc(ByteLength.internalSig);
+  const privateKeyPtr = secp256k1Wasm.malloc(ByteLength.privateKey);
 
   // tslint:disable-next-line:no-magic-numbers
   const lengthPtr = secp256k1Wasm.malloc(4);
@@ -332,11 +337,11 @@ const wrapSecp256k1Wasm = (
   const getSerializedPublicKey = (compressed: boolean) =>
     compressed
       ? serializePublicKey(
-          compressedPublicKeyLength,
+          ByteLength.compressedPublicKey,
           CompressionFlag.COMPRESSED
         )
       : serializePublicKey(
-          uncompressedPublicKeyLength,
+          ByteLength.uncompressedPublicKey,
           CompressionFlag.UNCOMPRESSED
         );
 
@@ -377,11 +382,11 @@ const wrapSecp256k1Wasm = (
       sigScratch,
       internalSigPtr
     );
-    return secp256k1Wasm.readHeapU8(sigScratch, compactSigLength).slice();
+    return secp256k1Wasm.readHeapU8(sigScratch, ByteLength.compactSig).slice();
   };
 
   const getDERSig = () => {
-    setLengthPtr(maxSigLength);
+    setLengthPtr(ByteLength.maxSig);
     secp256k1Wasm.signatureSerializeDER(
       contextPtr,
       sigScratch,
@@ -407,7 +412,7 @@ const wrapSecp256k1Wasm = (
   };
 
   const zeroOutPrivateKeyPtr = () => {
-    zeroOutPtr(privateKeyPtr, privateKeyLength);
+    zeroOutPtr(privateKeyPtr, ByteLength.privateKey);
   };
 
   const withPrivateKey = <T>(
@@ -504,7 +509,7 @@ const wrapSecp256k1Wasm = (
       }
 
       if (DER) {
-        setLengthPtr(maxSigLength);
+        setLengthPtr(ByteLength.maxSig);
         secp256k1Wasm.signatureSerializeDER(
           contextPtr,
           sigScratch,
@@ -518,7 +523,9 @@ const wrapSecp256k1Wasm = (
           sigScratch,
           internalSigPtr
         );
-        return secp256k1Wasm.readHeapU8(sigScratch, compactSigLength).slice();
+        return secp256k1Wasm
+          .readHeapU8(sigScratch, ByteLength.compactSig)
+          .slice();
       }
     });
   };
@@ -571,7 +578,7 @@ const wrapSecp256k1Wasm = (
     const randomSeedPtr = messageHashScratch;
     secp256k1Wasm.heapU8.set(randomSeed, randomSeedPtr);
     secp256k1Wasm.contextRandomize(contextPtr, randomSeedPtr);
-    zeroOutPtr(randomSeedPtr, randomSeedLength);
+    zeroOutPtr(randomSeedPtr, ByteLength.randomSeed);
   }
 
   return {

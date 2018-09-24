@@ -66,7 +66,9 @@ export const testHashFunction = <T extends HashFunction>(
         );
       }
     );
-    t.notThrows(() => fc.assert(equivalentToNative));
+    t.notThrows(() => {
+      fc.assert(equivalentToNative);
+    });
     const equivalentToBcoin = fc.property(
       fcUint8Array(0, testLength),
       message => {
@@ -76,7 +78,9 @@ export const testHashFunction = <T extends HashFunction>(
         );
       }
     );
-    t.notThrows(() => fc.assert(equivalentToBcoin));
+    t.notThrows(() => {
+      fc.assert(equivalentToBcoin);
+    });
     const equivalentToHashJs = fc.property(
       fcUint8Array(0, testLength),
       message => {
@@ -90,7 +94,9 @@ export const testHashFunction = <T extends HashFunction>(
         );
       }
     );
-    t.notThrows(() => fc.assert(equivalentToHashJs));
+    t.notThrows(() => {
+      fc.assert(equivalentToHashJs);
+    });
   });
 
   test(`${hashFunctionName} incremental hashing`, async t => {
@@ -151,6 +157,8 @@ export const testHashFunction = <T extends HashFunction>(
         t.deepEqual(incrementalResult, singlePassResult);
       }
     );
-    t.notThrows(() => fc.assert(equivalentToSinglePass));
+    t.notThrows(() => {
+      fc.assert(equivalentToSinglePass);
+    });
   });
 };

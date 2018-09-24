@@ -2,30 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "node",
-      "request": "launch",
-      "name": "Debug Project",
-      "cwd": "${workspaceFolder}",
-      "program": "${workspaceFolder}/src/cli/cli.ts",
-      // "args": ["--no-install"],
-      "outFiles": ["${workspaceFolder}/build/main/**/*.js"],
-      "skipFiles": [
-        "<node_internals>/**/*.js",
-        "${workspaceFolder}/node_modules/**/*.js"
-      ],
-      "preLaunchTask": "npm: build",
-      "stopOnEntry": true,
-      "smartStep": true,
-      "runtimeArgs": ["--nolazy"],
-      "console": "externalTerminal"
-    },
-    {
+      "name": "Debug Visible Compiled Spec",
       /// Usage: set appropriate breakpoints in a *.spec.ts file, then open the
       // respective *.spec.js file to run this task. Once a breakpoint is hit,
       // the debugger will open the source *.spec.ts file for debugging.
       "type": "node",
       "request": "launch",
-      "name": "Debug Visible Compiled Spec",
       "program": "${workspaceFolder}/node_modules/ava/profile.js",
       "args": [
         "${file}"
@@ -40,6 +22,63 @@
       // Consider using `yarn watch` for faster debugging
       // "preLaunchTask": "npm: build",
       // "smartStep": true,
+      "runtimeArgs": ["--nolazy"]
+    },
+    {
+      "name": "Debug VM Spec",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/ava/profile.js",
+      "args": [
+        "${workspaceFolder}/build/main/lib/auth/virtual-machine.spec.js"
+      ],
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "preLaunchTask": "npm: build",
+      "runtimeArgs": ["--nolazy"]
+    },
+    {
+      "name": "Debug Common -> Push Spec",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/ava/profile.js",
+      "args": [
+        "${workspaceFolder}/build/main/lib/auth/instruction-sets/common/push.spec.js"
+      ],
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "preLaunchTask": "npm: build",
+      "runtimeArgs": ["--nolazy"]
+    },
+    {
+      "name": "Debug Bitcoin Cash Instruction Set (requires yarn watch)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/lib/auth/instruction-sets/bitcoin-cash/bitcoin-cash.spec.debug.ts",
+      "outFiles": ["${workspaceFolder}/build/main/**/*.js"],
+      // "skipFiles": ["<node_internals>/**/*.js"],
+      // Consider commenting out the line below and using `yarn watch` instead for faster debugging
+      // "preLaunchTask": "npm: build",
+      "runtimeArgs": ["--nolazy"]
+    },
+    {
+      "name": "Debug Bitcoin Cash Instruction Set Spec",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/ava/profile.js",
+      "args": [
+        "${workspaceFolder}/build/main/lib/auth/instruction-sets/bitcoin-cash/bitcoin-cash.spec.js"
+      ],
+      "skipFiles": ["<node_internals>/**/*.js"],
+      "preLaunchTask": "npm: build",
+      "runtimeArgs": ["--nolazy"],
+      "stopOnEntry": true
+    },
+    {
+      "name": "Debug Transaction Spec (requires yarn watch)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/ava/profile.js",
+      "args": ["${workspaceFolder}/build/main/lib/transaction.spec.js"],
+      "skipFiles": ["<node_internals>/**/*.js"],
       "runtimeArgs": ["--nolazy"]
     }
   ]

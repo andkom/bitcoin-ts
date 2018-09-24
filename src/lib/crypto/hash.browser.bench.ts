@@ -7,13 +7,13 @@ import alias from 'rollup-plugin-alias';
 import commonjs from 'rollup-plugin-commonjs';
 
 const prepareCode = async () => {
-  // tslint:disable-next-line:no-unbound-method
+  // tslint:disable-next-line:no-unbound-method no-console
   const realConsoleWarn = console.warn;
   /**
    * Suppress Rollup warning: `Use of eval is strongly discouraged, as it poses
    * security risks and may cause issues with minification`
    */
-  // tslint:disable-next-line:no-object-mutation
+  // tslint:disable-next-line:no-object-mutation no-console
   console.warn = (suppress: string) => suppress;
 
   const bundle = await rollup({
@@ -28,7 +28,7 @@ const prepareCode = async () => {
       commonjs()
     ]
   });
-  // tslint:disable-next-line:no-object-mutation
+  // tslint:disable-next-line:no-object-mutation no-console
   console.warn = realConsoleWarn;
 
   const { code } = await bundle.generate({
